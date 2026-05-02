@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ushna — Frontend Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0c10;
+    --surface: #12141a;
+    --border: #1f2230;
+    --accent: #e8f55c;
+    --accent2: #5cf5c8;
+    --accent3: #f55c9b;
+    --text: #f0f0f0;
+    --muted: #6b7080;
+    --card: #161820;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow-x: hidden; cursor: none; }
+
+  .cursor { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.15s ease; mix-blend-mode: difference; }
+  .cursor-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 9998; transition: all 0.3s ease; opacity: 0.5; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; background: rgba(11,12,16,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--accent); letter-spacing: 2px; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.85rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.3s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta { background: var(--accent) !important; color: var(--bg) !important; padding: 0.5rem 1.2rem; }
+
+  .hero { min-height: 100vh; display: flex; align-items: center; padding: 120px 4rem 4rem; position: relative; overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1400px; width: 100%; margin: auto; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(232,245,92,0.08); border: 1px solid rgba(232,245,92,0.25); padding: 0.4rem 1rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent); margin-bottom: 2rem; letter-spacing: 1px; }
+  .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  .hero-title { font-size: clamp(2.8rem, 5vw, 5rem); font-weight: 800; line-height: 1.05; margin-bottom: 1.5rem; }
+  .hero-title .line { display: block; }
+  .hero-title .highlight { color: var(--accent); }
+  .hero-title .dim { color: var(--muted); font-weight: 400; }
+  .hero-desc { font-size: 1.1rem; color: var(--muted); line-height: 1.7; margin-bottom: 2.5rem; max-width: 500px; }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn-primary { background: var(--accent); color: var(--bg); padding: 0.9rem 2rem; font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700; text-decoration: none; letter-spacing: 1.5px; transition: all 0.3s; display: inline-block; }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(232,245,92,0.3); }
+  .btn-secondary { border: 1px solid var(--border); color: var(--text); padding: 0.9rem 2rem; font-family: 'Space Mono', monospace; font-size: 0.8rem; text-decoration: none; letter-spacing: 1.5px; transition: all 0.3s; display: inline-block; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; }
+  .code-window { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-width: 480px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.5); }
+  .code-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border); background: var(--card); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; } .dot-y { background: #febb2e; } .dot-g { background: #29ca42; }
+  .code-tab { margin-left: 1rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+  .code-body { padding: 1.5rem; font-family: 'Space Mono', monospace; font-size: 0.82rem; line-height: 2; }
+  .c-key { color: var(--accent3); } .c-val { color: var(--accent2); } .c-str { color: var(--accent); } .c-muted { color: var(--muted); } .c-fn { color: #a78bfa; }
+
+  .stats-row { display: flex; gap: 2rem; margin-top: 2.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+  .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--accent); display: block; font-family: 'Space Mono', monospace; }
+  .stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  section.padded { padding: 100px 4rem; max-width: 1400px; margin: 0 auto; }
+  section.full-w { padding: 100px 4rem; }
+  section.full-w > .inner { max-width: 1400px; margin: 0 auto; }
+
+  .section-label { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem; }
+  .section-label::before { content: ''; width: 30px; height: 1px; background: var(--accent); }
+  .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 1rem; }
+  .section-sub { color: var(--muted); font-size: 1.1rem; margin-bottom: 4rem; max-width: 500px; line-height: 1.6; }
+
+  .skills-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .skill-card { background: var(--card); border: 1px solid var(--border); padding: 2rem; transition: all 0.4s; position: relative; overflow: hidden; }
+  .skill-card::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--ca, var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s; }
+  .skill-card:hover::before { transform: scaleX(1); }
+  .skill-card:hover { border-color: var(--ca, var(--accent)); transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+  .skill-icon { font-size: 2rem; margin-bottom: 1.2rem; display: block; }
+  .skill-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .skill-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.2rem; }
+  .stag { font-family: 'Space Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.6rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); letter-spacing: 0.5px; }
+  .exp-bar { margin-top: 1rem; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .exp-fill { height: 100%; background: var(--ca, var(--accent)); width: 0; transition: width 2s cubic-bezier(0.1,0,0.2,1); }
+
+  .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .project-card { background: var(--card); border: 1px solid var(--border); padding: 2rem; transition: all 0.4s; display: flex; flex-direction: column; gap: 1rem; }
+  .project-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+  .project-num { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; }
+  .project-icon { font-size: 2.5rem; }
+  .project-title { font-size: 1.2rem; font-weight: 700; }
+  .project-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.6; flex: 1; }
+  .project-tech { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tech-badge { font-family: 'Space Mono', monospace; font-size: 0.65rem; padding: 0.3rem 0.7rem; background: rgba(232,245,92,0.07); border: 1px solid rgba(232,245,92,0.2); color: var(--accent); letter-spacing: 0.5px; }
+
+  .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .service-item { background: var(--card); padding: 3rem; transition: all 0.3s; }
+  .service-item:hover { background: var(--surface); }
+  .service-num { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 2px; margin-bottom: 1.5rem; }
+  .service-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.8rem; }
+  .service-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+
+  .contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+  .contact-info h3 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+  .contact-info p { color: var(--muted); line-height: 1.7; margin-bottom: 2rem; }
+  .contact-items { display: flex; flex-direction: column; gap: 1.5rem; }
+  .contact-item { display: flex; align-items: center; gap: 1rem; padding: 1.2rem; background: var(--card); border: 1px solid var(--border); font-size: 0.9rem; }
+  .contact-item-icon { width: 40px; height: 40px; background: rgba(232,245,92,0.08); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .contact-label { font-size: 0.7rem; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  .contact-val { font-weight: 600; margin-top: 0.2rem; }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1.5rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.5rem; }
+  .form-field label { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+  .form-field input, .form-field textarea { background: var(--card); border: 1px solid var(--border); padding: 0.9rem 1rem; color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.3s; width: 100%; resize: vertical; }
+  .form-field input:focus, .form-field textarea:focus { border-color: var(--accent); }
+  .submit-btn { background: var(--accent); color: var(--bg); border: none; padding: 1rem 2rem; font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 2px; cursor: none; transition: all 0.3s; text-transform: uppercase; width: 100%; }
+  .submit-btn:hover { box-shadow: 0 10px 30px rgba(232,245,92,0.35); transform: translateY(-2px); }
+
+  footer { border-top: 1px solid var(--border); padding: 2.5rem 4rem; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.8rem; font-family: 'Space Mono', monospace; }
+
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9997; opacity: 0.4; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(rgba(232,245,92,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(232,245,92,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+
+  @media (max-width: 1024px) {
+    nav { padding: 1.2rem 2rem; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 2rem 4rem; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    section.padded, section.full-w { padding: 80px 2rem; }
+    .skills-layout { grid-template-columns: 1fr 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .contact-layout { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="nav-logo">USHNA.DEV</div>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact" class="nav-cta">Hire Me</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div id="home" class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge">Available for Freelance Work</div>
+      <h1 class="hero-title">
+        <span class="line">Frontend</span>
+        <span class="line highlight">Web Developer</span>
+        <span class="line dim">& E-commerce Specialist</span>
+      </h1>
+      <p class="hero-desc">I craft pixel-perfect, responsive websites and e-commerce stores — static & dynamic business websites, WordPress, WooCommerce, and Shopify that look stunning and convert visitors into customers.</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn-primary">VIEW WORK</a>
+        <a href="#contact" class="btn-secondary">GET IN TOUCH</a>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><span class="stat-num">2+</span><span class="stat-label">Years Exp.</span></div>
+        <div class="stat"><span class="stat-num">10+</span><span class="stat-label">Projects</span></div>
+        <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Client Sat.</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="code-window">
+        <div class="code-header">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="code-tab">ushna.config.js</span>
+        </div>
+        <div class="code-body">
+          <div><span class="c-key">const</span> <span class="c-val">developer</span> <span class="c-muted">=</span> {</div>
+          <div>&nbsp;&nbsp;<span class="c-key">name</span><span class="c-muted">:</span> <span class="c-str">"Ushna"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="c-key">role</span><span class="c-muted">:</span> <span class="c-str">"Frontend Developer"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="c-key">cms</span><span class="c-muted">:</span> [<span class="c-str">"WordPress"</span>, <span class="c-str">"Shopify"</span>],</div>
+          <div>&nbsp;&nbsp;<span class="c-key">frontend</span><span class="c-muted">:</span> [<span class="c-str">"HTML"</span>, <span class="c-str">"CSS"</span>, <span class="c-str">"JS"</span>],</div>
+          <div>&nbsp;&nbsp;<span class="c-key">sites</span><span class="c-muted">:</span> [<span class="c-str">"Static"</span>, <span class="c-str">"Dynamic"</span>],</div>
+          <div>&nbsp;&nbsp;<span class="c-key">available</span><span class="c-muted">:</span> <span class="c-val">true</span>,</div>
+          <div>};</div><br>
+          <div><span class="c-fn">hire</span><span class="c-muted">(</span><span class="c-val">developer</span><span class="c-muted">);</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section class="padded" id="skills">
+  <div class="reveal">
+    <div class="section-label">What I Know</div>
+    <h2 class="section-title">Skills & Expertise</h2>
+    <p class="section-sub">From CMS platforms to custom code — I cover the full stack of modern web development.</p>
+  </div>
+  <div class="skills-layout reveal">
+    <div class="skill-card" style="--ca: #e8f55c;">
+      <span class="skill-icon">🎨</span>
+      <div class="skill-name">Frontend Development</div>
+      <div class="skill-desc">Building responsive, beautiful interfaces that work across all devices and browsers.</div>
+      <div class="skill-tags"><span class="stag">HTML5</span><span class="stag">CSS3</span><span class="stag">JavaScript</span><span class="stag">Responsive</span></div>
+      <div class="exp-bar"><div class="exp-fill" data-w="92%"></div></div>
+    </div>
+    <div class="skill-card" style="--ca: #5cf5c8;">
+      <span class="skill-icon">⚙️</span>
+      <div class="skill-name">Backend Development</div>
+      <div class="skill-desc">Server-side logic, APIs, and database management for robust web applications.</div>
+      <div class="skill-tags"><span class="stag">PHP</span><span class="stag">MySQL</span><span class="stag">REST APIs</span><span class="stag">CRUD</span></div>
+      <div class="exp-bar"><div class="exp-fill" data-w="85%"></div></div>
+    </div>
+    <div class="skill-card" style="--ca: #f55c9b;">
+      <span class="skill-icon">🛒</span>
+      <div class="skill-name">WordPress & WooCommerce</div>
+      <div class="skill-desc">Custom themes, plugins, and fully configured online stores with WooCommerce.</div>
+      <div class="skill-tags"><span class="stag">WordPress</span><span class="stag">WooCommerce</span><span class="stag">Elementor</span><span class="stag">ACF</span></div>
+      <div class="exp-bar"><div class="exp-fill" data-w="95%"></div></div>
+    </div>
+    <div class="skill-card" style="--ca: #a78bfa;">
+      <span class="skill-icon">🏪</span>
+      <div class="skill-name">Shopify Development</div>
+      <div class="skill-desc">Custom Shopify stores, theme customization, app integration, and store optimization.</div>
+      <div class="skill-tags"><span class="stag">Shopify</span><span class="stag">Liquid</span><span class="stag">Theme Dev</span><span class="stag">Payments</span></div>
+      <div class="exp-bar"><div class="exp-fill" data-w="88%"></div></div>
+    </div>
+    <div class="skill-card" style="--ca: #5cf5c8;">
+      <span class="skill-icon">🗄️</span>
+      <div class="skill-name">Database Design</div>
+      <div class="skill-desc">Designing and optimizing MySQL databases for performance and data integrity.</div>
+      <div class="skill-tags"><span class="stag">MySQL</span><span class="stag">Queries</span><span class="stag">Schema</span><span class="stag">Optimization</span></div>
+      <div class="exp-bar"><div class="exp-fill" data-w="80%"></div></div>
+    </div>
+    <div class="skill-card" style="--ca: #e8f55c;">
+      <span class="skill-icon">🚀</span>
+      <div class="skill-name">Performance & SEO</div>
+      <div class="skill-desc">Speed optimization, Core Web Vitals, and SEO best practices for better rankings.</div>
+      <div class="skill-tags"><span class="stag">Speed Opt.</span><span class="stag">SEO</span><span class="stag">Core Vitals</span><span class="stag">Analytics</span></div>
+      <div class="exp-bar"><div class="exp-fill" data-w="78%"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="full-w" id="projects" style="background: var(--surface);">
+  <div class="inner">
+    <div class="reveal">
+      <div class="section-label">What I've Built</div>
+      <h2 class="section-title">Selected Projects</h2>
+      <p class="section-sub">A collection of work spanning e-commerce, full-stack apps, and custom websites.</p>
+    </div>
+    <div class="projects-grid reveal">
+      <div class="project-card">
+        <div class="project-num">01 / E-COMMERCE</div>
+        <div class="project-icon">🛍️</div>
+        <div class="project-title">Multi-Vendor WooCommerce Store</div>
+        <div class="project-desc">A fully custom WooCommerce marketplace with vendor management, payment gateway integration, and a custom dashboard for store owners to track orders and revenue.</div>
+        <div class="project-tech"><span class="tech-badge">WordPress</span><span class="tech-badge">WooCommerce</span><span class="tech-badge">PHP</span><span class="tech-badge">MySQL</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-num">02 / SHOPIFY</div>
+        <div class="project-icon">🏪</div>
+        <div class="project-title">Fashion Brand Shopify Store</div>
+        <div class="project-desc">Built a high-converting Shopify store for a fashion brand — custom Liquid theme, product filter system, wishlist functionality, and full mobile optimization.</div>
+        <div class="project-tech"><span class="tech-badge">Shopify</span><span class="tech-badge">Liquid</span><span class="tech-badge">JavaScript</span><span class="tech-badge">CSS3</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-num">03 / Management </div>
+        <div class="project-icon">📦</div>
+        <div class="project-title">Inventory Management System</div>
+        <div class="project-desc">A custom PHP + MySQL web app for a business to manage stock, generate reports, and handle supplier orders — replacing a manual spreadsheet workflow entirely.</div>
+        <div class="project-tech"><span class="tech-badge">PHP</span><span class="tech-badge">MySQL</span><span class="tech-badge">HTML/CSS</span><span class="tech-badge">JavaScript</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-num">04 / FRONTEND</div>
+        <div class="project-icon">🌐</div>
+        <div class="project-title">Agency Landing Page</div>
+        <div class="project-desc">A sleek, animated marketing landing page for a digital agency with scroll-triggered animations, video background, and optimized performance scores.</div>
+        <div class="project-tech"><span class="tech-badge">HTML5</span><span class="tech-badge">CSS3</span><span class="tech-badge">JavaScript</span><span class="tech-badge">GSAP</span></div>
+      </div>
+      <div class="project-card">
+        <div class="project-num">05 / WORDPRESS</div>
+        <div class="project-icon">📰</div>
+        <div class="project-title">News Portal with Custom Plugin</div>
+        <div class="project-desc">A high-traffic WordPress news site with a custom-built breaking news ticker plugin, ad management system, and optimized database queries for speed.</div>
+        <div class="project-tech"><span class="tech-badge">WordPress</span><span class="tech-badge">PHP</span><span class="tech-badge">Custom Plugin</span><span class="tech-badge">MySQL</span></div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="padded" id="services">
+  <div class="reveal">
+    <div class="section-label">What I Offer</div>
+    <h2 class="section-title">Services</h2>
+    <p class="section-sub">End-to-end web development solutions tailored to your business goals.</p>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-item">
+      <div class="service-num">01</div>
+      <div class="service-title">WordPress & WooCommerce Development</div>
+      <div class="service-desc">Custom themes from scratch, WooCommerce store setup, plugin development, speed optimization, and ongoing maintenance. Your WordPress site, exactly as you envision it.</div>
+    </div>
+    <div class="service-item">
+      <div class="service-num">02</div>
+      <div class="service-title">Shopify Store Setup & Customization</div>
+      <div class="service-desc">End-to-end Shopify store creation — from product setup and payment integration to custom Liquid theme development and conversion rate optimization.</div>
+    </div>
+    <div class="service-item">
+      <div class="service-num">03</div>
+      <div class="service-title">Custom Frontend Development</div>
+      <div class="service-desc">Pixel-perfect, responsive websites built with clean HTML, CSS, and JavaScript. Smooth animations, fast load times, and beautiful UI across all screen sizes.</div>
+    </div>
+    <div class="service-item">
+      <div class="service-num">04</div>
+      <div class="service-title">Backend & Database Solutions</div>
+      <div class="service-desc">PHP-based backends, RESTful APIs, and MySQL database design. I build the engine that powers your application — secure, scalable, and maintainable.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="full-w" id="contact" style="background: var(--surface);">
+  <div class="inner">
+    <div class="reveal">
+      <div class="section-label">Get In Touch</div>
+      <h2 class="section-title">Let's Work Together</h2>
+    </div>
+    <div class="contact-layout reveal">
+      <div class="contact-info">
+        <h3>Have a project<br><span style="color:var(--accent);">in mind?</span></h3>
+        <p>Whether it's a brand new e-commerce store, a website redesign, or a custom web application — I'm here to help you build it right.</p>
+        <div class="contact-items">
+          <div class="contact-item">
+            <div class="contact-item-icon">📧</div>
+            <div><div class="contact-label">Email</div><div class="contact-val">ushnafatima63@email.com</div></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">📍</div>
+            <div><div class="contact-label">Location</div><div class="contact-val">Pakistan — Available Worldwide</div></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">⚡</div>
+            <div><div class="contact-label">Response Time</div><div class="contact-val">Within 24 Hours</div></div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 Ushna — All rights reserved.</div>
+  <div>Built with HTML · CSS · JavaScript</div>
+  <div style="color:var(--accent);">Available for Freelance ●</div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.left=mx-6+'px'; cursor.style.top=my-6+'px';
+  });
+  (function anim(){rx+=(mx-rx-20)*0.12; ry+=(my-ry-20)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(anim);})();
+  document.querySelectorAll('a,button,.skill-card,.project-card,.service-item').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)'; ring.style.transform='scale(1.5)'; ring.style.opacity='0.8';});
+    el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)'; ring.style.transform='scale(1)'; ring.style.opacity='0.5';});
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach((entry,i)=>{
+      if(entry.isIntersecting){
+        setTimeout(()=>{ entry.target.classList.add('in-view'); }, i*100);
+        // Animate skill bars
+        entry.target.querySelectorAll('.exp-fill').forEach(bar=>{
+          bar.style.width = bar.getAttribute('data-w');
+        });
+      }
+    });
+  },{threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  // Form
+  document.getElementById('contactForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const btn=document.getElementById('submitBtn');
+    btn.textContent='SENDING...'; btn.disabled=true;
+    setTimeout(()=>{ btn.style.display='none'; document.getElementById('formSuccess').style.display='block'; },1200);
+  });
+</script>
+</body>
+</html>
